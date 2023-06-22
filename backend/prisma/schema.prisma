@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  password  String
+  email     String
+  created_at DateTime
+  messages  Message[] // Update "products" to "messages"
+  controls  Control[]
+  @@map("user")
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  title        String
+  content String
+  published   Boolean
+  likesQty    Float
+  created_at  DateTime
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  controls    Control[]
+  @@map("message") // Update "product" to "message"
+}
+
+model Control {
+  id         Int       @id @default(autoincrement())
+  type       String
+  quantity   Float
+  created_at DateTime
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
+  messageId  Int       // Update "productId" to "messageId"
+  message    Message   @relation(fields: [messageId], references: [id], onDelete: Cascade) // Update "product" to "message"
+  @@map("control")
+}
